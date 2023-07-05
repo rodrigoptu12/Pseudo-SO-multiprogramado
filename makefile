@@ -1,20 +1,20 @@
-CC = gcc
-CFLAGS = -Wall -Wextra -Werror -pedantic -std=c99 -g
+CXX = g++
+CXXFLAGS = -Wall -Wextra -g -std=c++11 
 
-SRCS = arquivo1.c arquivo2.c
-OBJS = $(SRCS:.c=.o)
+SRCS = arquivo1.cpp arquivo2.cpp
+OBJS = $(SRCS:.cpp=.o)
 PROGRAM = nome_do_programa
 
 all: $(PROGRAM)
 
 $(PROGRAM): $(OBJS)
-$(CC) $(CFLAGS) -o $@ $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $(OBJS)
 
-%.o: %.c
-$(CC) $(CFLAGS) -c $<
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $<
 
 run: $(PROGRAM)
-./$(PROGRAM)
+	./$(PROGRAM)
 
 clean:
-rm -f $(PROGRAM) $(OBJS)
+	rm -f $(PROGRAM) $(OBJS)
