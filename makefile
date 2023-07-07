@@ -1,20 +1,35 @@
-CXX = g++
-CXXFLAGS = -Wall -Wextra -g -std=c++11 
+CXX = g++ # Compilador
+CXXFLAGS = -Wall -Wextra -g -std=c++11  # Flags de compilação
 
-SRCS = arquivo1.cpp arquivo2.cpp
-OBJS = $(SRCS:.cpp=.o)
-PROGRAM = nome_do_programa
+TARGET = dispatcher# Nome do executável
+PFILE = processes.txt # Arquivos de entrada
+FFILE = files.txt # Arquivos de entrada
 
-all: $(PROGRAM)
+OBJ_DIR = obj
+SRC_DIR = src
 
-$(PROGRAM): $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $@ $(OBJS)
+$(shell mkdir -p $(OBJ_DIR)) # Cria a pasta obj se ela não existir
 
-%.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $<
+#SOURCES := $(shell find $(SRC_DIR) -name '*.cpp') # Encontra todos os arquivos .cpp
+SOURCES = src/main.cpp src/file/file.cpp src/process/process.cpp src/utils/utils.cpp
+OBJECTS := $(patsubst $(SRC_DIR)/%,$(OBJ_DIR)/%,$(SOURCES:.cpp=.o)) # Substitui src por obj e .cpp por .o
 
-run: $(PROGRAM)
-	./$(PROGRAM)
+.PHONY: all clean # Indica que essas regras não são arquivos
+
+all: $(TARGET)
+	$(info $(shell echo -e "\033[0;33m$(SOURCES)\033[0m")) 
+	$(info $(shell echo -e "\033[0;32m$(OBJECTS)\033[0m"))
+
+$(TARGET): $(OBJECTS) 
+	$(CXX) $(CXXFLAGS) $(OBJECTS) -o $(TARGET)
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	@mkdir -p $(@D)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+
+run: $(TARGET)
+	./$(TARGET) $(PFILE) $(FFILE)
 
 clean:
-	rm -f $(PROGRAM) $(OBJS)
+	rm -rf $(TARGET) $(OBJ_DIR)
