@@ -49,6 +49,9 @@
     "ctime": "cpp",
     "map": "cpp",
     "ratio": "cpp",
-    "cinttypes": "cpp"
+    "cinttypes": "cpp",
+    "bitset": "cpp",
+    "set": "cpp",
+    "list": "cpp"
   }
 }

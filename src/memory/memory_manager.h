@@ -1,41 +1,28 @@
 #ifndef MEMORYMANAGER_H
 #define MEMORYMANAGER_H
 
-#include "../process/process_manager.h"
-
 #define RT_PROCESS_MEMORY_SIZE 64
 #define USER_PROCESS_MEMORY_SIZE 960
 
+#include <vector>
+
 class MemoryManager {
  private:
-  static int userProcessMemory;
-  static int rtProcessMemory;
-
-  // Retorna a memória atual do processo do usuário.
-  static int getUserProcessMemoryAvailable();
-
-  // Retorna a memória atual do processo em tempo real.
-  static int getRTProcessMemoryAvailable();
+  static std::vector<int> userProcessMemory;  // int will be the pid of the process
+  static std::vector<int> rtProcessMemory;    // int will be the pid of the process
 
  public:
   // Verifica se há memória suficiente disponível para o processo especificado.
   // Se o processo for em tempo real (prioridade 0), ele verifica a memória do processo em tempo
   // real. Se o processo for um processo do usuário (prioridade diferente de 0), ele verifica a
   // memória do processo do usuário.
-  static bool isMemoryAvailable(Process& process);
+  static bool isMemoryAvailable(int blocks, int priority, int* offset);
 
-  // Verifica se a solicitação de memória do processo fornecido é válida.
-  // Se o processo for em tempo real (prioridade 0), verifica se a requisição de memória não
-  // excede o tamanho total da memória do processo em tempo real. Se o processo for um processo de
-  // usuário (prioridade não 0), ele verifica se a solicitação de memória não excede o tamanho total
-  // da memória do processo do usuário.
-  static bool isMemoryRequestValid(Process& process);
+  // Adiciona o processo à memória e retorna o offset da memória onde o processo foi alocado.
+  static int addProcessToMemory(int blocks, int priority, int offset);
 
-  // Retorna o tamanho total da memória do processo
-  static void addProcessToMemory(int blocks, int ProcessMemory);
-
-  // Retorna o tamanho total da memória do processo
-  static void removeProcessFromMemory(int blocks, int ProcessMemory);
+  // Remove o processo da memória.
+  static void removeProcessFromMemory(int blocks, int priority, int offset);
 };
 
 #endif

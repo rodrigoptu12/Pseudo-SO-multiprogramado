@@ -15,10 +15,16 @@ Process::Process(int startTimestamp, int priority, int cpuTime, int allocatedBlo
   this->diskNumber = diskNumber;
 
   this->memoryOffset = 0;
-  this->printerUsage = false;
-  this->scannerUsage = false;
-  this->driverUsage = false;
-  this->modemUsage = false;
+  this->printerAllocated = (requiredPrinterCode == 0 ? true : false);
+  this->scannerAllocated = (isScannerUsed == 0 ? true : false);
+  this->driverAllocated = (diskNumber == 0 ? true : false);
+  this->modemAllocated = (isModemUsed == 0 ? true : false);
+  // MemoryManager::isMemoryAvailable(allocatedBlocks, priority, &memoryOffset);
+  // MemoryManager::addProcessToMemory(allocatedBlocks, priority, memoryOffset);
+}
+
+Process::~Process() {
+  // MemoryManager::removeProcessFromMemory(allocatedBlocks, priority, memoryOffset);
 }
 
 int Process::getPID() const { return this->pid; }
@@ -39,15 +45,36 @@ int Process::getIsModemUsed() const { return this->isModemUsed; }
 
 int Process::getDiskNumber() const { return this->diskNumber; }
 
-void Process::decreaseCPUTime() {
-  this->cpuTime--;
+void Process::decreaseCPUTimeByQuantum(int quantum) {
+  this->cpuTime -= quantum;
   if (this->cpuTime < 0) this->cpuTime = 0;
 }
 
-void Process::setPrinterUsage(bool printerUsage) { this->printerUsage = printerUsage; }
+void Process::setPrinterAllocated(bool printerAllocated) {
+  this->printerAllocated = printerAllocated;
+}
 
-void Process::setScannerUsage(bool scannerUsage) { this->scannerUsage = scannerUsage; }
+void Process::setScannerAllocated(bool scannerAllocated) {
+  this->scannerAllocated = scannerAllocated;
+}
 
-void Process::setDriverUsage(bool driverUsage) { this->driverUsage = driverUsage; }
+void Process::setPriority(int priority) { this->priority = priority; }
 
-void Process::setModemUsage(bool modemUsage) { this->modemUsage = modemUsage; }
+void Process::setDriverAllocated(bool driverAllocated) { this->driverAllocated = driverAllocated; }
+
+void Process::setModemAllocated(bool modemAllocated) { this->modemAllocated = modemAllocated; }
+
+bool Process::getPrinterAllocated() const { return this->printerAllocated; }
+
+bool Process::getScannerAllocated() const { return this->scannerAllocated; }
+
+bool Process::getDriverAllocated() const { return this->driverAllocated; }
+
+bool Process::getModemAllocated() const { return this->modemAllocated; }
+
+bool Process::hasAllocatedResources() const {
+  return this->printerAllocated && this->scannerAllocated && this->driverAllocated &&
+         this->modemAllocated;
+}
+
+bool Process::hasFinished() const { return this->cpuTime == 0; }

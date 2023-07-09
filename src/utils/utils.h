@@ -1,10 +1,10 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include <vector>
+#include <iostream>
 #include <sstream>
 #include <string>
-#include <iostream>
+#include <vector>
 
 // split string by splitter
 std::vector<std::string> split(std::string str, char splitter);
@@ -15,6 +15,6 @@ struct ProgramArguments {
 };
 
 // parse program arguments
-ProgramArguments parseProgramArguments(int argc, char const *argv[]);
+ProgramArguments parseProgramArguments(int argc, char const* argv[]);
 
 #endif  // UTILS_H

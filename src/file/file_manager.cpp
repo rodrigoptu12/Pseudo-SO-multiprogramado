@@ -1,5 +1,7 @@
 #include "file_manager.h"
 
+#include <iostream>
+
 // initialize static variables
 
 std::vector<char> FileManager::blocks;
@@ -16,40 +18,42 @@ std::vector<FileOperation> FileManager::fileOperations;
 
 void FileManager::loadInitFile(const char* fileFileName) {
   // open file
-  // get first and second line of files.txt
   std::ifstream files_file(fileFileName);
   if (!files_file.is_open()) throw std::runtime_error("Error opening files file");
   std::string line;
-
+  // get total blocks and occupied blocks
   std::getline(files_file, line);
   totalBlocks = std::stoi(line);
   std::getline(files_file, line);
-  occupiedBlocks = std::stoi(line) + 2;  // +2 because of the first two lines
+  int filesSaved = std::stoi(line);
 
-  blocks.resize(totalBlocks, NULL);  // initialize blocks with NULL
+  blocks.resize(totalBlocks, '0');  // initialize blocks with 0
 
-  int occupiedBlocksCounter = 0;  // counter to know how many occupied blocks we have already read
+  int fileSaveCounter = 0;  // counter to know how many occupied blocks we have already read
   // get files that are already in the file manager
-  while (std::getline(files_file, line) && occupiedBlocks > occupiedBlocksCounter++) {
+  while (filesSaved > fileSaveCounter++ && std::getline(files_file, line)) {
     std::vector<std::string> lineVector = split(line, ',');  // split line by comma
 
     char name = lineVector[0][0];
     int startBlock = std::stoi(lineVector[1]);
     int quantityBlocks = std::stoi(lineVector[2]);
 
-    // add file to blocks
     addFile(NO_OWNER, name, quantityBlocks, startBlock);
   }
 
   // get file operations
-  // create -> 0, 0, A, 5
-  // delete -> 0, 1, X
   while (std::getline(files_file, line)) {
     std::vector<std::string> lineVector = split(line, ',');  // split line by comma
 
     int processId = std::stoi(lineVector[0]);
     FileOperationType type = (FileOperationType)std::stoi(lineVector[1]);
+
+    // remove spaces from name
+    lineVector[2].erase(std::remove(lineVector[2].begin(), lineVector[2].end(), ' '),
+                        lineVector[2].end());
+
     char name = lineVector[2][0];
+
     int quantityBlocks = (type == CREATE ? std::stoi(lineVector[3]) : 0);
 
     addFileOperation(processId, type, name, quantityBlocks);
@@ -77,11 +81,11 @@ FileOperationResult FileManager::addFile(int processOwner, char name, int quanti
       return fileOperationResult;
     }
 
-    // if we find a NULL block, we increment freeBlocksCounter
-    if (blocks[i] == NULL) {
+    // if we find a 0 block, we increment freeBlocksCounter
+    if (blocks[i] == '0') {
       if (freeBlocksCounter == 0) _startBlock = i;
       freeBlocksCounter++;
-      // if we find a non-NULL block, we reset freeBlocksCounter
+      // if we find a non-0 block, we reset freeBlocksCounter
     } else {
       freeBlocksCounter = 0;
     }
@@ -94,11 +98,25 @@ FileOperationResult FileManager::addFile(int processOwner, char name, int quanti
       filesOwner[name] = processOwner;
 
       // return success message
+      std::string message =
+          "O processo " + std::to_string(processOwner) + " criou o arquivo " + name;
+      if (quantityBlocks == 1) 
+        message += " (bloco: ";
+      else
+        message += " (blocos: ";
+      for (int j = _startBlock; j < _startBlock + quantityBlocks; j++) {
+        message += std::to_string(j);
+        if (j < _startBlock + quantityBlocks - 2) {
+          message += ", ";
+        } else if (j == _startBlock + quantityBlocks - 2) {
+          message += " e ";
+        } else {
+          message += ").";
+        }
+      }
+
       fileOperationResult.success = true;
-      fileOperationResult.message =
-          "O processo " + std::to_string(processOwner) + " criou o arquivo " + name + " blocos:";
-      for (int j = _startBlock; j < _startBlock + quantityBlocks; j++)
-        fileOperationResult.message += " " + std::to_string(j);
+      fileOperationResult.message = message;
       return fileOperationResult;
     }
   }
@@ -110,7 +128,6 @@ FileOperationResult FileManager::addFile(int processOwner, char name, int quanti
 
   return fileOperationResult;
 }
-
 FileOperationResult FileManager::removeFile(int processOwner, char name) {
   // check if file exists
   if (filesOwner.find(name) == filesOwner.end()) {
@@ -123,7 +140,7 @@ FileOperationResult FileManager::removeFile(int processOwner, char name) {
   // remove file from blocks
   for (int i = 0; i < totalBlocks; i++) {
     if (blocks[i] == name) {
-      blocks[i] = NULL;
+      blocks[i] = '0';
       occupiedBlocks--;
     }
   }
@@ -156,6 +173,13 @@ FileOperationsResult FileManager::executeFileOperations() {
 
     FileOperationResult fileOperationResult = executeFileOperation(fileOperation);
     fileOperationsResult.fileOperationResults.push_back(fileOperationResult);
+
+    // print block status
+    std::cout << "Blocos: ";
+    for (int i = 0; i < totalBlocks; i++) {
+      std::cout << blocks[i] << " ";
+    }
+    std::cout << std::endl;
   }
 
   return fileOperationsResult;
@@ -184,11 +208,12 @@ FileOperationResult FileManager::executeFileOperation(FileOperation fileOperatio
 
       return removeFile(fileOperation.processId, fileOperation.name);
     }
+    default: {
+      FileOperationResult fileOperationResult = {
+          false, "O tipo de operação " + std::to_string(fileOperation.type) + " não existe."};
+      return fileOperationResult;
+    }
   }
-}
-
-void FileManager::setProcessManager(ProcessManager* processManager) {
-  FileManager::processManager = processManager;
 }
 
 // getters

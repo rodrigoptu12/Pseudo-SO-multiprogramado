@@ -3,6 +3,8 @@
 
 #include <iostream>  // cout, endl
 
+#include "../memory/memory_manager.h"
+
 class Process {
  private:
   static int pidCounter;  // counter of process IDs
@@ -18,14 +20,15 @@ class Process {
   int diskNumber;           // number of disk used by process
 
   // attributes below are not passed by constructor
-  int memoryOffset;   // offset of memory block
-  bool printerUsage;  // if process uses printer
-  bool scannerUsage;  // if process uses scanner
-  bool driverUsage;   // if process uses driver
-  bool modemUsage;    // if process uses modem
+  int memoryOffset;       // offset of memory block
+  bool printerAllocated;  // if printer is allocated
+  bool scannerAllocated;  // if scanner is allocated
+  bool driverAllocated;   // if driver is allocated
+  bool modemAllocated;    // if modem is allocated
  public:
   Process(int startTimestamp, int priority, int cpuTime, int allocatedBlocks,
           int requiredPrinterCode, int isScannerUsed, int isModemUsed, int diskNumber);
+  ~Process();
   int getPID() const;
   int getStartTimestamp() const;
   int getPriority() const;
@@ -36,11 +39,20 @@ class Process {
   int getIsModemUsed() const;
   int getDiskNumber() const;
 
-  void decreaseCPUTime();  // decrease CPU time by 1 ms
-  void setPrinterUsage(bool printerUsage);
-  void setScannerUsage(bool scannerUsage);
-  void setDriverUsage(bool driverUsage);
-  void setModemUsage(bool modemUsage);
+  void decreaseCPUTimeByQuantum(int quantum);
+  void setPrinterAllocated(bool printerAllocated);
+  void setScannerAllocated(bool scannerAllocated);
+  void setDriverAllocated(bool driverAllocated);
+  void setModemAllocated(bool modemAllocated);
+  void setPriority(int priority);
+
+  bool getPrinterAllocated() const;
+  bool getScannerAllocated() const;
+  bool getDriverAllocated() const;
+  bool getModemAllocated() const;
+
+  bool hasAllocatedResources() const;  // verify if process has allocated resources
+  bool hasFinished() const;            // verify if process has finished
 };
 
 #endif  // PROCESS_H

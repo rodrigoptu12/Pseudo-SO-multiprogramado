@@ -41,8 +41,6 @@ class FileManager {
   static std::map<char, int> filesOwner;  // map of files and their owners <file name, process id>
   static std::vector<FileOperation> fileOperations;  // operations of file manager to be executed
 
-  static ProcessManager* processManager;  // process manager to get processes information (priority)
-
   // add file to blocks using first-fit
   static FileOperationResult addFile(int processOwner, char name, int quantityBlocks,
                                      int startBlock);
@@ -53,8 +51,6 @@ class FileManager {
   static FileOperationResult executeFileOperation(FileOperation fileOperation);
 
  public:
-  static void setProcessManager(ProcessManager* processManager);
-
   // load init file
   static void loadInitFile(const char* fileFileName);
 

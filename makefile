@@ -10,8 +10,7 @@ SRC_DIR = src
 
 $(shell mkdir -p $(OBJ_DIR)) # Cria a pasta obj se ela não existir
 
-#SOURCES := $(shell find $(SRC_DIR) -name '*.cpp') # Encontra todos os arquivos .cpp
-SOURCES = src/main.cpp src/file/file.cpp src/process/process.cpp src/utils/utils.cpp
+SOURCES := $(shell find $(SRC_DIR) -name '*.cpp') # Encontra todos os arquivos .cpp
 OBJECTS := $(patsubst $(SRC_DIR)/%,$(OBJ_DIR)/%,$(SOURCES:.cpp=.o)) # Substitui src por obj e .cpp por .o
 
 .PHONY: all clean # Indica que essas regras não são arquivos

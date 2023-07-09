@@ -5,7 +5,7 @@ bool Resources::availableScanners = true;
 std::vector<bool> Resources::availableDrivers = {true, true};
 bool Resources::availableModems = true;
 
-bool Resources::getAvailablePrinter(int printerId) { return availablePrinters[printerId];} 
+bool Resources::getAvailablePrinter(int printerId) { return availablePrinters[printerId]; }
 
 bool Resources::getAvailableScanners() { return availableScanners; }
 
@@ -41,30 +41,10 @@ void Resources::useModem() {
   availableModems = false;
 }
 
-void Resources::freePrinter(int printerId) {
-  if (availablePrinters[printerId]) {
-    throw std::runtime_error("No printers to free");
-  }
-  availablePrinters[printerId] = true;
-}
+void Resources::freePrinter(int printerId) { availablePrinters[printerId] = true; }
 
-void Resources::freeScanner() {
-  if (availableScanners) {
-    throw std::runtime_error("No scanners to free");
-  }
-  availableScanners = true;
-}
+void Resources::freeScanner() { availableScanners = true; }
 
-void Resources::freeDriver(int driverId) {
-  if (availableDrivers[driverId]) {
-    throw std::runtime_error("No drivers to free");
-  }
-  availableDrivers[driverId] = true;
-}
+void Resources::freeDriver(int driverId) { availableDrivers[driverId] = true; }
 
-void Resources::freeModem() {
-  if (availableModems) {
-    throw std::runtime_error("No modems to free");
-  }
-  availableModems = true;
-}
+void Resources::freeModem() { availableModems = true; }
