@@ -52,6 +52,7 @@
     "cinttypes": "cpp",
     "bitset": "cpp",
     "set": "cpp",
-    "list": "cpp"
+    "list": "cpp",
+    "thread": "cpp"
   }
 }

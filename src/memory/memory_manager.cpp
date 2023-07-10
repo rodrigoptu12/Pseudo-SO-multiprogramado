@@ -37,7 +37,6 @@ bool MemoryManager::isMemoryAvailable(int blocks, int priority, int* offset) {
       }
     }
   }
-
   return false;
 }
 

@@ -58,11 +58,13 @@ class FileManager {
   static bool addFileOperation(int processId, FileOperationType type, char name,
                                int quantityBlocks);
 
+  static void removePIDFromFilesOwner(int pid);
+
   // execute file operations
   static FileOperationsResult executeFileOperations();
 
   // get blocks current state
-  static std::vector<char> getBlocks();
+  static void printBlocks();
 };
 
 #endif  // FILE_MANAGER_H

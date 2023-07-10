@@ -30,6 +30,7 @@ void FileManager::loadInitFile(const char* fileFileName) {
   blocks.resize(totalBlocks, '0');  // initialize blocks with 0
 
   int fileSaveCounter = 0;  // counter to know how many occupied blocks we have already read
+
   // get files that are already in the file manager
   while (filesSaved > fileSaveCounter++ && std::getline(files_file, line)) {
     std::vector<std::string> lineVector = split(line, ',');  // split line by comma
@@ -65,14 +66,9 @@ void FileManager::loadInitFile(const char* fileFileName) {
 FileOperationResult FileManager::addFile(int processOwner, char name, int quantityBlocks,
                                          int startBlock) {
   FileOperationResult fileOperationResult = {true, ""};
-  int _startBlock = 0;
-  int freeBlocksCounter = 0;  // counter to know how many blocks we have already read
 
-  // add file to blocks using first-fit
-  // example: if we have 10 blocks and we want to add a file with 3 blocks, we will search for 3
-  // consecutive free blocks and add the file to these blocks
-  for (int i = startBlock; i < totalBlocks; i++) {
-    // EXTRA IF STATEMENT TO CHECK IF FILE ALREADY EXISTS (NO RELATION WITH FIRST-FIT)
+  // check if file already exists
+  for (int i = 0; i < totalBlocks; i++) {
     if (blocks[i] == name) {
       fileOperationResult.success = false;
       fileOperationResult.message = "O processo " + std::to_string(processOwner) +
@@ -80,7 +76,14 @@ FileOperationResult FileManager::addFile(int processOwner, char name, int quanti
                                     " porque ele já existe no disco.";
       return fileOperationResult;
     }
+  }
 
+  // add file to blocks using first-fit
+  // example: if we have 10 blocks and we want to add a file with 3 blocks, we will search for 3
+  // consecutive free blocks and add the file to these blocks
+  int _startBlock = 0;
+  int freeBlocksCounter = 0;  // counter to know how many blocks we have already read
+  for (int i = startBlock; i < totalBlocks; i++) {
     // if we find a 0 block, we increment freeBlocksCounter
     if (blocks[i] == '0') {
       if (freeBlocksCounter == 0) _startBlock = i;
@@ -100,7 +103,7 @@ FileOperationResult FileManager::addFile(int processOwner, char name, int quanti
       // return success message
       std::string message =
           "O processo " + std::to_string(processOwner) + " criou o arquivo " + name;
-      if (quantityBlocks == 1) 
+      if (quantityBlocks == 1)
         message += " (bloco: ";
       else
         message += " (blocos: ";
@@ -128,6 +131,7 @@ FileOperationResult FileManager::addFile(int processOwner, char name, int quanti
 
   return fileOperationResult;
 }
+
 FileOperationResult FileManager::removeFile(int processOwner, char name) {
   // check if file exists
   if (filesOwner.find(name) == filesOwner.end()) {
@@ -152,6 +156,16 @@ FileOperationResult FileManager::removeFile(int processOwner, char name) {
   return fileOperationResult;
 }
 
+void FileManager::removePIDFromFilesOwner(int processId) {
+  for (auto it = filesOwner.begin(); it != filesOwner.end();) {
+    if (it->second == processId) {
+      it = filesOwner.erase(it);
+    } else {
+      ++it;
+    }
+  }
+}
+
 bool FileManager::addFileOperation(int processId, FileOperationType type, char name,
                                    int quantityBlocks) {
   try {
@@ -173,13 +187,6 @@ FileOperationsResult FileManager::executeFileOperations() {
 
     FileOperationResult fileOperationResult = executeFileOperation(fileOperation);
     fileOperationsResult.fileOperationResults.push_back(fileOperationResult);
-
-    // print block status
-    std::cout << "Blocos: ";
-    for (int i = 0; i < totalBlocks; i++) {
-      std::cout << blocks[i] << " ";
-    }
-    std::cout << std::endl;
   }
 
   return fileOperationsResult;
@@ -217,4 +224,10 @@ FileOperationResult FileManager::executeFileOperation(FileOperation fileOperatio
 }
 
 // getters
-std::vector<char> FileManager::getBlocks() { return blocks; }
+void FileManager::printBlocks() {
+  std::cout << "Mapa de ocupacao do disco: " << std::endl;
+  for (auto it = blocks.begin(); it != blocks.end(); ++it) {
+    std::cout << *it << " ";
+  }
+  std::cout << std::endl;
+}

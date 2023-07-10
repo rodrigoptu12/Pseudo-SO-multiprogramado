@@ -106,21 +106,21 @@ Process* Queues::getNextScannerProcess() {
 }
 
 Process* Queues::getNextDriver1Process() {
-  if (!driver1Queue.empty()) throw std::runtime_error("Driver 1 queue is empty");
+  if (driver1Queue.empty()) throw std::runtime_error("Driver 1 queue is empty");
   Process* process = driver1Queue.front();
   driver1Queue.pop();
   return process;
 }
 
 Process* Queues::getNextDriver2Process() {
-  if (!driver2Queue.empty()) throw std::runtime_error("Driver 2 queue is empty");
+  if (driver2Queue.empty()) throw std::runtime_error("Driver 2 queue is empty");
   Process* process = driver2Queue.front();
   driver2Queue.pop();
   return process;
 }
 
 Process* Queues::getNextModemProcess() {
-  if (!modemQueue.empty()) throw std::runtime_error("Modem queue is empty");
+  if (modemQueue.empty()) throw std::runtime_error("Modem queue is empty");
   Process* process = modemQueue.front();
   modemQueue.pop();
   return process;

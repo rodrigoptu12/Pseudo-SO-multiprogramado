@@ -8,28 +8,31 @@ Dispatcher::Dispatcher(const char* processesFileName, const char* filesFileName)
 }
 
 void Dispatcher::run() {
-  // get processes
-  std::vector<Process*>* processes = ProcessManager::getProcesses();
-
-  // print pid from processes
-
-  Queues::setGlobalQueue(*processes);  // sort processes by start timestamp
-  for (Process* process : *processes) {
-    std::cout << process->getPID() << std::endl;
-  }
-
   FileOperationsResult fileOperationsResult = FileManager::executeFileOperations();
 
   // run processes in queues
   ProcessManager::runProcesses();
 
   // print file operations result fileOperationsResult.fileOperationResults
+  // if operation failed print in red color and if success print in green color
   int operationCounter = 1;
   for (FileOperationResult fileOperationResult : fileOperationsResult.fileOperationResults) {
-    std::string successMessage = "Operacao " + std::to_string(operationCounter) + " => Sucesso";
-    std::string failMessage = "Operacao " + std::to_string(operationCounter) + " => Falha";
-    std::cout << (fileOperationResult.success ? successMessage : failMessage) << std::endl;
+    // set color
+    std::cout << "\033[";
+    if (fileOperationResult.success)
+      std::cout << "32m";  // green
+    else
+      std::cout << "31m";  // red
+
+    // print message
+    std::cout << "Operacao " << operationCounter << " => "
+              << (fileOperationResult.success ? "Sucesso" : "Falha") << std::endl;
     std::cout << fileOperationResult.message << std::endl;
+    // reset color
+    std::cout << "\033[0m";
     operationCounter++;
   }
+
+  // print map of files
+  FileManager::printBlocks();
 }

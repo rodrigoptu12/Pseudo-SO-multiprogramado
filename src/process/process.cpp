@@ -4,7 +4,7 @@ int Process::pidCounter = 0;
 
 Process::Process(int startTimestamp, int priority, int cpuTime, int allocatedBlocks,
                  int requiredPrinterCode, int isScannerUsed, int isModemUsed, int diskNumber) {
-  this->pid = pidCounter++;  // increment pidCounter and assign to pid
+  this->pid = pidCounter;
   this->startTimestamp = startTimestamp;
   this->priority = priority;
   this->cpuTime = cpuTime;
@@ -15,16 +15,23 @@ Process::Process(int startTimestamp, int priority, int cpuTime, int allocatedBlo
   this->diskNumber = diskNumber;
 
   this->memoryOffset = 0;
-  this->printerAllocated = (requiredPrinterCode == 0 ? true : false);
-  this->scannerAllocated = (isScannerUsed == 0 ? true : false);
-  this->driverAllocated = (diskNumber == 0 ? true : false);
-  this->modemAllocated = (isModemUsed == 0 ? true : false);
-  // MemoryManager::isMemoryAvailable(allocatedBlocks, priority, &memoryOffset);
-  // MemoryManager::addProcessToMemory(allocatedBlocks, priority, memoryOffset);
+  this->timeInCPU = 0;
+  this->printerAllocated = false;
+  this->scannerAllocated = false;
+  this->driverAllocated = false;
+  this->modemAllocated = false;
+
+  // Allocate memory for process
+  if (MemoryManager::isMemoryAvailable(allocatedBlocks, priority, &memoryOffset)) {
+    MemoryManager::addProcessToMemory(allocatedBlocks, priority, memoryOffset);
+  } else {
+    throw std::runtime_error("Not enough memory available for process");
+  }
+  pidCounter++;  // increment process ID counter for next process
 }
 
 Process::~Process() {
-  // MemoryManager::removeProcessFromMemory(allocatedBlocks, priority, memoryOffset);
+  MemoryManager::removeProcessFromMemory(this->allocatedBlocks, this->priority, this->memoryOffset);
 }
 
 int Process::getPID() const { return this->pid; }
@@ -45,10 +52,7 @@ int Process::getIsModemUsed() const { return this->isModemUsed; }
 
 int Process::getDiskNumber() const { return this->diskNumber; }
 
-void Process::decreaseCPUTimeByQuantum(int quantum) {
-  this->cpuTime -= quantum;
-  if (this->cpuTime < 0) this->cpuTime = 0;
-}
+void Process::updateCPUTimeByQuantum(int quantum) { this->timeInCPU += quantum; }
 
 void Process::setPrinterAllocated(bool printerAllocated) {
   this->printerAllocated = printerAllocated;
@@ -72,9 +76,33 @@ bool Process::getDriverAllocated() const { return this->driverAllocated; }
 
 bool Process::getModemAllocated() const { return this->modemAllocated; }
 
+int Process::getTimeInCPU() const { return this->timeInCPU; }
+
 bool Process::hasAllocatedResources() const {
-  return this->printerAllocated && this->scannerAllocated && this->driverAllocated &&
-         this->modemAllocated;
+  bool printerAllocated = this->requiredPrinterCode == 0 ? true : this->printerAllocated;
+  bool scannerAllocated = this->isScannerUsed == 0 ? true : this->scannerAllocated;
+  bool driverAllocated = this->diskNumber == 0 ? true : this->driverAllocated;
+  bool modemAllocated = this->isModemUsed == 0 ? true : this->modemAllocated;
+
+  return printerAllocated && scannerAllocated && driverAllocated && modemAllocated;
 }
 
-bool Process::hasFinished() const { return this->cpuTime == 0; }
+bool Process::hasFinished() const { return this->timeInCPU >= this->cpuTime; }
+
+void Process::processInfo() const {
+  std::cout << "  PID: " << this->pid << std::endl;
+  std::cout << "  offset: " << this->memoryOffset << std::endl;
+  std::cout << "  blocks: " << this->allocatedBlocks << std::endl;
+  std::cout << "  priority: " << this->priority << std::endl;
+  std::cout << "  time: " << this->cpuTime << std::endl;
+  std::cout << "  printers: " << this->requiredPrinterCode << std::endl;
+  std::cout << "  scanners: " << this->isScannerUsed << std::endl;
+  std::cout << "  modems: " << this->isModemUsed << std::endl;
+  std::cout << "  drives: " << this->diskNumber << std::endl;
+  std::cout << "  Extra info: " << std::endl;
+  std::cout << "    printerAllocated: " << this->printerAllocated << std::endl;
+  std::cout << "    scannerAllocated: " << this->scannerAllocated << std::endl;
+  std::cout << "    driverAllocated: " << this->driverAllocated << std::endl;
+  std::cout << "    modemAllocated: " << this->modemAllocated << std::endl;
+  std::cout << "    timeInCPU: " << this->timeInCPU << std::endl;
+}

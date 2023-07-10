@@ -20,6 +20,7 @@ class Process {
   int diskNumber;           // number of disk used by process
 
   // attributes below are not passed by constructor
+  int timeInCPU;          // time spent in CPU
   int memoryOffset;       // offset of memory block
   bool printerAllocated;  // if printer is allocated
   bool scannerAllocated;  // if scanner is allocated
@@ -39,7 +40,7 @@ class Process {
   int getIsModemUsed() const;
   int getDiskNumber() const;
 
-  void decreaseCPUTimeByQuantum(int quantum);
+  void updateCPUTimeByQuantum(int quantum);
   void setPrinterAllocated(bool printerAllocated);
   void setScannerAllocated(bool scannerAllocated);
   void setDriverAllocated(bool driverAllocated);
@@ -50,9 +51,12 @@ class Process {
   bool getScannerAllocated() const;
   bool getDriverAllocated() const;
   bool getModemAllocated() const;
+  int getTimeInCPU() const;
 
   bool hasAllocatedResources() const;  // verify if process has allocated resources
   bool hasFinished() const;            // verify if process has finished
+
+  void processInfo() const;  // print process info
 };
 
 #endif  // PROCESS_H
