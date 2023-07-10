@@ -1,7 +1,5 @@
 #include "file_manager.h"
 
-#include <iostream>
-
 // initialize static variables
 
 std::vector<char> FileManager::blocks;
@@ -157,11 +155,9 @@ FileOperationResult FileManager::removeFile(int processOwner, char name) {
 }
 
 void FileManager::removePIDFromFilesOwner(int processId) {
-  for (auto it = filesOwner.begin(); it != filesOwner.end();) {
+  for (auto it = filesOwner.begin(); it != filesOwner.end(); ++it) {
     if (it->second == processId) {
-      it = filesOwner.erase(it);
-    } else {
-      ++it;
+      it->second = NO_OWNER;  // remove process from filesOwner
     }
   }
 }

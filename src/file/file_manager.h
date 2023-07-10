@@ -2,8 +2,9 @@
 #define FILE_MANAGER_H
 
 #include <fstream>  // ifstream
-#include <map>      // map
-#include <vector>   // vector
+#include <iostream>
+#include <map>     // map
+#include <vector>  // vector
 
 #include "../process/process_manager.h"
 #include "../utils/utils.h"  // split
