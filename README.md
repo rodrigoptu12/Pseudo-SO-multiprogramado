@@ -1,18 +1,20 @@
 # Pseudo-SO-multiprogramado
 
-
 # Documentação do Programa FileManager (file_manager.h)
 
 Este programa serve como um gerenciador de arquivos. Ele é capaz de adicionar e remover arquivos de um sistema de arquivos simulado. Ele também é capaz de executar uma série de operações de arquivos em um determinado momento.
 
 ## Classe: `FileManager`
 
-### Variáveis Estáticas:
-
+### Variáveis
 1. `blocks` : Um vetor que representa os blocos de armazenamento, cada arquivo individual é representado por um caractere específico no vetor.
+
 2. `totalBlocks` : Um inteiro representando o número total de blocos de memória.
+
 3. `occupiedBlocks` : Um inteiro representando o número de blocos atualmente ocupados.
+
 4. `filesOwner` : Um mapa onde a chave é um caractere representando um arquivo e o valor é um inteiro representando o ID do processo que possui o arquivo.
+
 5. `fileOperations` : Um vetor de objetos `FileOperation` representando as operações que devem ser realizadas nos arquivos.
 
 ### Método: `void loadInitFile(const char* fileFileName)`
@@ -47,10 +49,37 @@ Este método executa uma única operação de arquivo. As operações podem ser 
 
 Um método getter que retorna o vetor de blocos que representa os blocos de armazenamento.
 
+# Gerenciador de Memória (memory_manager.h)
+
+O gerenciador de memória é usado para gerenciar a memória para processos em tempo real e processos de usuário.
+
+## Variáveis Estáticas
+
+1. `userProcessMemory`: Esta variável representa a memória do processo do usuário. Ela é um vetor de inteiros, onde cada inteiro é o PID de um processo. A quantidade de memória disponível para processos do usuário é definida como 960 blocos.
+
+2. `rtProcessMemory`: Esta variável representa a memória do processo em tempo real. Ela é um vetor de inteiros, onde cada inteiro é o PID de um processo. A quantidade de memória disponível para processos em tempo real é definida como 64 blocos.
+
+## Funções
+
+### isMemoryAvailable(int blocks, int priority, int\* offset)
+
+Esta função verifica se há memória suficiente disponível para o processo especificado. Se o processo for em tempo real (prioridade 0), ele verifica a memória do processo em tempo real. Se o processo for um processo do usuário (prioridade diferente de 0), ele verifica a memória do processo do usuário.
+
+### addProcessToMemory(int blocks, int priority, int offset)
+
+Esta função adiciona o processo à memória e retorna o offset da memória onde o processo foi alocado.
+
+### removeProcessFromMemory(int blocks, int priority, int offset)
+
+Esta função remove o processo da memória.
 
 # Gerenciador de Processos (process_manager.h)
 
 O Gerenciador de Processos é responsável por criar, executar e finalizar processos. Ele também é responsável por alocar recursos para processos que precisam deles.
+
+## Variáveis
+
+1. `processes` : Esta variável representa os processos do gerenciador de processos. Ela é um vetor de ponteiros para Process, onde cada Process é um processo no sistema operacional.
 
 ## Funções
 
@@ -130,11 +159,162 @@ Esta função verifica se um processo tem o recurso de driver de que precisa.
 
 Esta função verifica se um processo tem o recurso de modem de que precisa.
 
+# Processos (process.h)
 
+A classe Process representa um processo no contexto de uma simulação de um sistema operacional. Abaixo, você encontrará uma descrição das variáveis e funções que compõem a classe Process.
+
+## Variáveis
+
+1. `pidCounter`: É um contador de ID's de processo que garante a unicidade do ID de cada processo (pid).
+
+2. `pid`: É o ID único de cada processo. Atribuído através do pidCounter.
+
+3. `startTimestamp`: Representa o carimbo de data/hora de quando o processo foi criado.
+
+4. `priority`: A prioridade do processo.
+
+5. `cpuTime`: Representa o tempo que o processo gastou na CPU.
+
+6. `allocatedBlocks`: Representa o número de blocos de memória alocados para o processo.
+
+7. `requiredPrinterCode`: Indica o código da impressora que o processo irá utilizar.
+
+8. `isScannerUsed`: Sinaliza se o processo faz uso de um scanner.
+
+9. `isModemUsed`: Sinaliza se o processo faz uso de um modem.
+
+10. `diskNumber`: Representa o número do disco que o processo irá utilizar.
+
+11. `timeInCPU`: Representa o tempo total que o processo passou na CPU.
+
+12. `memoryOffset`: Representa o offset do bloco de memória para o processo.
+
+13. `printerAllocated`: Sinaliza se uma impressora foi alocada para o processo.
+
+14. `scannerAllocated`: Sinaliza se um scanner foi alocado para o processo.
+
+15. `driverAllocated`: Sinaliza se um driver foi alocado para o processo.
+
+16. `modemAllocated`: Sinaliza se um modem foi alocado para o processo.
+
+## Funções
+
+### Método: `Process()`
+
+Construtor da classe. Inicializa as variáveis com os valores fornecidos.
+
+### Método: `~Process()`
+
+Destrutor da classe.
+
+### Método: `getPID()`
+
+Retorna o ID do processo.
+
+### Método: `getStartTimestamp()`
+
+Retorna o carimbo de data/hora de início do processo.
+
+### Método: `getPriority()`
+
+Retorna a prioridade do processo.
+
+### Método: `geCPUTime()`
+
+Retorna o tempo de CPU usado pelo processo.
+
+### Método: `getAllocatedBlocks()`
+
+Retorna o número de blocos de memória `alocados para o processo.
+
+### Método: `getRequiredPrinterCode()`
+
+Retorna o código da impressora necessária pelo processo.
+
+### Método: `getIsScannerUsed()`
+
+Retorna se o processo utiliza um scanner.
+
+### Método: `getIsModemUsed()`
+
+Retorna se o processo usa um modem.
+
+### Método: `getDiskNumber()`
+
+Retorna o número do disco usado pelo processo.
+
+### Método: `updateCPUTimeByQuantum(int quantum)`
+
+Atualiza o tempo de CPU do processo pelo quantum passado como argumento.
+
+### Método: `setPrinterAllocated(bool printerAllocated)`
+
+Define se uma impressora foi alocada para o processo.
+
+### Método: `setScannerAllocated(bool scannerAllocated)`
+
+Define se um scanner foi alocado para o processo.
+
+### Método: `setDriverAllocated(bool driverAllocated)`
+
+Define se um driver foi alocado para o processo.
+
+### Método: `setModemAllocated(bool modemAllocated)`
+
+Define se um modem foi alocado para o processo.
+
+### Método: `setPriority(int priority)`
+
+Define a prioridade do processo.
+
+### Método: `getPrinterAllocated()`
+
+Retorna se uma impressora foi alocada para o processo.
+
+### Método: `getScannerAllocated()`
+
+Retorna se um scanner foi alocado para o processo.
+
+### Método: `getDriverAllocated()`
+
+Retorna se um driver foi alocado para o processo.
+
+### Método: `getModemAllocated()`
+
+Retorna se um modem foi alocado para o processo.
+
+### Método: `getTimeInCPU()`
+
+Retorna o tempo total gasto pelo processo na CPU.
+
+### Método: `hasAllocatedResources()`
+
+Verifica se o processo tem recursos alocados.
+
+### Método: `hasFinished()`
+
+Verifica se o processo terminou.
+
+### Método: `processInfo()`
+
+Imprime as informações do processo.
 
 # Filas (queues.h)
 
 As filas são usadas para gerenciar processos em um sistema operacional ou aplicativo similar.
+
+## Variaveis
+
+1. `realTimeQueue`: Esta fila armazena processos em tempo real.
+
+2. `userQueue1`, `userQueue2`, `userQueue3`: Estas filas armazenam processos de usuários. A divisão em três filas pode ser usada para implementar um esquema de prioridades entre os processos de usuários.
+
+3. `printer1Queue`, `printer2Queue`: Estas filas armazenam processos que estão aguardando para usar as impressoras 1 e 2, respectivamente.
+
+4. `scannerQueue`: Esta fila armazena processos que estão aguardando para usar o scanner.
+
+5. `driver1Queue`, `driver2Queue`: Estas filas armazenam processos que estão aguardando para usar os drivers 1 e 2, respectivamente.
+6. `modemQueue`: Esta fila armazena processos que estão aguardando para usar o modem.
 
 ## Funções
 
@@ -226,11 +406,19 @@ Esta função retorna o próximo processo da fila do driver 2. Se a fila estiver
 
 Esta função retorna o próximo processo da fila do modem. Se a fila estiver vazia, ela lança um erro.
 
-
-
 # Recursos (resources.h)
 
 Os recursos são usados para gerenciar a disponibilidade de impressoras, scanners, drivers e modems.
+
+## Variáveis
+
+1. `availablePrinters1 e availablePrinters2`: Estas são variáveis booleanas que representam a disponibilidade de duas impressoras no sistema. Se o valor for verdadeiro, a impressora correspondente está disponível; se for falso, a impressora está em uso.
+
+2. `availableScanners`: Esta é uma variável booleana que representa a disponibilidade de um scanner no sistema. Se o valor for verdadeiro, o scanner está disponível; se for falso, o scanner está em uso.
+
+3. `availableDrivers1 e availableDrivers2`: Estas são variáveis booleanas que representam a disponibilidade de dois drivers no sistema. Se o valor for verdadeiro, o driver correspondente está disponível; se for falso, o driver está em uso.
+
+4. `availableModems`: Esta é uma variável booleana que representa a disponibilidade de um modem no sistema. Se o valor for verdadeiro, o modem está disponível; se for falso, o modem está em uso.
 
 ## Funções
 
@@ -282,8 +470,6 @@ Esta função libera o driver com o ID fornecido. Se o ID for inválido, ela lan
 
 Esta função libera o modem.
 
-
-
 # Utilitários (utils.h)
 
 Os utilitários são usados para fornecer funções auxiliares que são comumente usadas em todo o programa.
@@ -297,4 +483,24 @@ Esta função divide uma string em um vetor de strings com base em um caractere 
 ### Método: `parseProgramArguments(int argc, char const *argv[])`
 
 Esta função analisa os argumentos do programa. Se o número de argumentos não for 3, ela imprime uma mensagem de uso e sai do programa.
+
+### Variáveis na estrutura ProgramArguments
+
+1. `processesFileName`: Esta é uma variável do tipo const char* que representa o nome do arquivo que contém as informações dos processos.
+   
+2 .`filesFileName`: Esta é uma variável do tipo const char* que representa o nome do arquivo que contém as informações dos arquivos.
+
+
+# Dispatcher (Dispatcher.h) 
+
+Este arquivo define a classe `Dispatcher`, que é responsável por gerenciar os processos de execução e arquivos a partir das informações obtidas dos arquivos especificados. 
+
+- `processesFileName`: O nome do arquivo que contém as informações dos processos. Essas informações serão usadas pelo `Dispatcher` para gerenciar os processos em sua execução.
+- `filesFileName`: O nome do arquivo que contém as informações dos arquivos. O `Dispatcher` usará essas informações para realizar operações relacionadas aos arquivos.
+
+## Métodos
+
+### `void run();`
+
+Este método é usado para iniciar o `Dispatcher`. Quando este método é chamado, o `Dispatcher` começa a gerenciar os processos e arquivos de acordo com as informações fornecidas nos arquivos especificados no momento da criação do `Dispatcher`.
 
