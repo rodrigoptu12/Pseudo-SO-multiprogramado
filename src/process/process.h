@@ -48,7 +48,7 @@ class Process {
   void setPriority(int priority);
 
   bool getPrinterAllocated() const;
-  bool getScannerAllocated() const;w
+  bool getScannerAllocated() const;
   bool getDriverAllocated() const;
   bool getModemAllocated() const;
   int getTimeInCPU() const;
