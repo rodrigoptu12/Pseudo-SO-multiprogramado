@@ -5,6 +5,20 @@
 
 #include "../memory/memory_manager.h"
 
+// struct to store process waiting to be allocated in memory
+struct WaitingProcess {
+  int pid;
+  int startTimestamp;
+  int priority;
+  int cpuTime;
+  int allocatedBlocks;
+  int requiredPrinterCode;
+  int isScannerUsed;
+  int isModemUsed;
+  int diskNumber;
+};
+
+// class to store process information, it is created only when process is allocated in memory
 class Process {
  private:
   static int pidCounter;  // counter of process IDs

@@ -16,8 +16,9 @@ std::vector<FileOperation> FileManager::fileOperations;
 
 void FileManager::loadInitFile(const char* fileFileName) {
   // open file
-  std::ifstream files_file(fileFileName);
-  if (!files_file.is_open()) throw std::runtime_error("Error opening files file");
+  std::string fileContent = parseFilesFile(fileFileName);  // parse file
+  std::istringstream files_file(fileContent);  // convert content to stream to read line by line
+
   std::string line;
   // get total blocks and occupied blocks
   std::getline(files_file, line);
@@ -57,8 +58,6 @@ void FileManager::loadInitFile(const char* fileFileName) {
 
     addFileOperation(processId, type, name, quantityBlocks);
   }
-
-  files_file.close();
 }
 
 FileOperationResult FileManager::addFile(int processOwner, char name, int quantityBlocks,

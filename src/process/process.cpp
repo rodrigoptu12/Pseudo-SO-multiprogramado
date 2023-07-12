@@ -21,11 +21,17 @@ Process::Process(int startTimestamp, int priority, int cpuTime, int allocatedBlo
   this->driverAllocated = false;
   this->modemAllocated = false;
 
+  // Check if process size is greater than memory size and throw exception if it is (process will
+  // not be allocated)
+  if (MemoryManager::isProcessSizeGreaterThanMemorySize(allocatedBlocks, priority)) {
+    throw std::runtime_error("PROCESS_SIZE_GREATER_THAN_MEMORY_SIZE");
+  }
+
   // Allocate memory for process
   if (MemoryManager::isMemoryAvailable(allocatedBlocks, priority, &memoryOffset)) {
     MemoryManager::addProcessToMemory(allocatedBlocks, priority, memoryOffset);
   } else {
-    throw std::runtime_error("Not enough memory available for process");
+    throw std::runtime_error("NOT_ENOUGH_MEMORY_AVAILABLE_AT_THE_MOMENT");
   }
   pidCounter++;  // increment process ID counter for next process
 }

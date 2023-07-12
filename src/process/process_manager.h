@@ -49,6 +49,8 @@ class ProcessManager {
 
   static Process *getProcess(int pid);
 
+  static void allocateMemoryToProcessesInQueueIfPossible();
+
  public:
   static void loadInitFile(const char *processFileName);
 

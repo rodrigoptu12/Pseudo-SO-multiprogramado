@@ -8,6 +8,8 @@
 
 class Queues {
  private:
+  static std::queue<WaitingProcess*> waitQueue;  // queue for processes waiting for available memory
+
   static std::queue<Process*> realTimeQueue;
   static std::queue<Process*> userQueue1;
   static std::queue<Process*> userQueue2;
@@ -21,6 +23,11 @@ class Queues {
   static std::queue<Process*> modemQueue;
 
  public:
+  // Memory queue
+  static void addToWaitMemoryQueue(WaitingProcess* process);
+  static bool isWaitMemoryQueueEmpty();
+  static WaitingProcess* getNextWaitMemoryProcess();
+
   // Rersources queues
   static void addToPrinter1Queue(Process* process);
   static void addToPrinter2Queue(Process* process);

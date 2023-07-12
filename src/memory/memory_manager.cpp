@@ -40,6 +40,14 @@ bool MemoryManager::isMemoryAvailable(int blocks, int priority, int* offset) {
   return false;
 }
 
+bool MemoryManager::isProcessSizeGreaterThanMemorySize(int blocks, int priority) {
+  if (priority == 0) {
+    return blocks > RT_PROCESS_MEMORY_SIZE;
+  } else {
+    return blocks > USER_PROCESS_MEMORY_SIZE;
+  }
+}
+
 int MemoryManager::addProcessToMemory(int blocks, int priority, int offset) {
   if (priority == 0) {
     for (int i = offset; i < offset + blocks; i++) {

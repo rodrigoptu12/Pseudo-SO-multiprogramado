@@ -1,5 +1,7 @@
 #include "queues.h"
 
+std::queue<WaitingProcess*> Queues::waitQueue;
+
 std::queue<Process*> Queues::realTimeQueue;
 std::queue<Process*> Queues::userQueue1;
 std::queue<Process*> Queues::userQueue2;
@@ -123,5 +125,16 @@ Process* Queues::getNextModemProcess() {
   if (modemQueue.empty()) throw std::runtime_error("Modem queue is empty");
   Process* process = modemQueue.front();
   modemQueue.pop();
+  return process;
+}
+
+void Queues::addToWaitMemoryQueue(WaitingProcess* process) { waitQueue.push(process); }
+
+bool Queues::isWaitMemoryQueueEmpty() { return waitQueue.empty(); }
+
+WaitingProcess* Queues::getNextWaitMemoryProcess() {
+  if (waitQueue.empty()) throw std::runtime_error("Wait memory queue is empty");
+  WaitingProcess* process = waitQueue.front();
+  waitQueue.pop();
   return process;
 }

@@ -4,8 +4,8 @@ std::vector<Process *> ProcessManager::processes;
 
 void ProcessManager::loadInitFile(const char *processFileName) {
   // open file
-  std::ifstream process_file(processFileName);
-  if (!process_file.is_open()) throw std::runtime_error("Error opening process file");
+  std::string fileContent = parseProcessesFile(processFileName);  // parse file
+  std::istringstream process_file(fileContent);  // convert content to stream to read line by line
 
   std::string line;
 
@@ -26,7 +26,6 @@ void ProcessManager::loadInitFile(const char *processFileName) {
                   isScannerUsed, isModemUsed, diskNumber);
   }
 
-  process_file.close();
   // sort processes by start timestamp
   sortProcessesByStartTimestamp();
   Queues::setGlobalQueue(processes);
@@ -48,7 +47,23 @@ int ProcessManager::createProcess(int startTimestamp, int priority, int cpuTime,
     processes.push_back(process);
     return process->getPID();
   } catch (std::runtime_error &e) {
-    return -1;  // error creating process
+    if (strcmp(e.what(), "NOT_ENOUGH_MEMORY_AVAILABLE_AT_THE_MOMENT") == 0) {
+      WaitingProcess *waitingProcess = new WaitingProcess;
+      waitingProcess->startTimestamp = startTimestamp;
+      waitingProcess->priority = priority;
+      waitingProcess->cpuTime = cpuTime;
+      waitingProcess->allocatedBlocks = allocatedBlocks;
+      waitingProcess->requiredPrinterCode = requiredPrinterCode;
+      waitingProcess->isScannerUsed = isScannerUsed;
+      waitingProcess->isModemUsed = isModemUsed;
+      waitingProcess->diskNumber = diskNumber;
+
+      Queues::addToWaitMemoryQueue(waitingProcess);
+      // process will be created later
+      return -1;  // error creating process, not enough memory available
+    }
+    // process will not be created
+    return -1;  // error creating process, process size is greater than memory size
   }
 }
 
@@ -164,6 +179,7 @@ void ProcessManager::runProcesses() {
         releaseResources(process);
         allocateResourcesToProcessesInQueues();
         deleteProcess(process->getPID());
+        allocateMemoryToProcessesInQueueIfPossible();
         break;
       case BLOCKED:
         break;
@@ -179,9 +195,6 @@ void ProcessManager::runProcesses() {
 void ProcessManager::rotatePriority(Process *process) {
   switch (process->getPriority()) {
     break;
-    case 1:
-      process->setPriority(3);
-      break;
     case 2:
       process->setPriority(1);
       break;
@@ -190,6 +203,25 @@ void ProcessManager::rotatePriority(Process *process) {
       break;
   }
 }
+
+// MEMORY METHODS
+void ProcessManager::allocateMemoryToProcessesInQueueIfPossible() {
+  // if there are waiting processes, try to allocate them
+  if (!Queues::isWaitMemoryQueueEmpty()) {
+    WaitingProcess *waitingProcess = Queues::getNextWaitMemoryProcess();
+    int pid = createProcessesAndAddToReadyQueue(
+        waitingProcess->startTimestamp, waitingProcess->priority, waitingProcess->cpuTime,
+        waitingProcess->allocatedBlocks, waitingProcess->requiredPrinterCode,
+        waitingProcess->isScannerUsed, waitingProcess->isModemUsed, waitingProcess->diskNumber);
+    if (pid == -1) {  // process was not created
+      Queues::addToWaitMemoryQueue(waitingProcess);
+    } else {  // process was created
+      delete waitingProcess;
+    }
+  }
+}
+
+// RESOURCES METHODS
 
 void ProcessManager::allocateResourcesToProcessesInQueues() {
   // if printer 1 queue is not empty and printer 1 is available

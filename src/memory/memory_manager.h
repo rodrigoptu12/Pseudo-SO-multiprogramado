@@ -18,6 +18,9 @@ class MemoryManager {
   // memória do processo do usuário.
   static bool isMemoryAvailable(int blocks, int priority, int* offset);
 
+  // Verifica se o tamanho do processo é maior que o tamanho da memória.
+  static bool isProcessSizeGreaterThanMemorySize(int blocks, int priority);
+
   // Adiciona o processo à memória e retorna o offset da memória onde o processo foi alocado.
   static int addProcessToMemory(int blocks, int priority, int offset);
 
