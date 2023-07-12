@@ -94,3 +94,26 @@ std::string parseProcessesFile(const char* processesFileName) {
 
   return fileContent;
 }
+
+bool compare(const std::string& a, const std::string& b) {
+    std::istringstream ss_a(a), ss_b(b);
+    int num_a, num_b;
+    ss_a >> num_a;
+    ss_b >> num_b;
+    return num_a < num_b; 
+}
+
+std::string sortByTimeStamp (std::string fileContent) {
+std::vector<std::string> linhas;
+  std::stringstream ss(fileContent);
+  std::string linha;
+  while (std::getline(ss, linha, '\n')) {
+    linhas.push_back(linha);
+  }
+  std::sort(linhas.begin(), linhas.end(), compare);
+  std::string sortedFileContent;
+  for (std::string linha : linhas) {
+    sortedFileContent += linha + "\n";
+  }
+  return sortedFileContent;
+}

@@ -26,4 +26,9 @@ std::string parseFilesFile(const char* fileFileName);
 // match any expected pattern)
 std::string parseProcessesFile(const char* processesFileName);
 
+bool compare(const std::string& a, const std::string& b);
+
+std::string sortByTimeStamp (std::string fileContent);
+
+
 #endif  // UTILS_H

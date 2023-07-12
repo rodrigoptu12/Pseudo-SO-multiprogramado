@@ -1,5 +1,6 @@
 {
   "files.associations": {
+    "*.ejs": "html",
     "array": "cpp",
     "atomic": "cpp",
     "bit": "cpp",
@@ -53,6 +54,12 @@
     "bitset": "cpp",
     "set": "cpp",
     "list": "cpp",
-    "thread": "cpp"
+    "thread": "cpp",
+    "compare": "cpp",
+    "concepts": "cpp",
+    "regex": "cpp",
+    "numbers": "cpp",
+    "semaphore": "cpp",
+    "stop_token": "cpp"
   }
 }

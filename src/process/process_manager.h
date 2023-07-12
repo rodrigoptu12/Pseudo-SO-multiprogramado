@@ -22,6 +22,8 @@ class ProcessManager {
  private:
   static std::vector<Process *> processes;  // processes of process manager
 
+  static std::vector<int> executedProcesses;   // processes executed
+  
   static ProcessState verifyResources(Process *process);  // verify if process has the  resources
 
   static void releaseResources(Process *process);  // release resources of process
@@ -29,8 +31,6 @@ class ProcessManager {
   static void allocateResourcesToProcessesInQueues();  // allocate resources to processes in queues
 
   static void rotatePriority(Process *process);  // rotate priority of process
-
-  static void sortProcessesByStartTimestamp();  // sort processes by start timestamp
 
   static void deleteProcess(int pid);
 

@@ -8,11 +8,11 @@ Dispatcher::Dispatcher(const char* processesFileName, const char* filesFileName)
 }
 
 void Dispatcher::run() {
-  FileOperationsResult fileOperationsResult = FileManager::executeFileOperations();
 
   // run processes in queues
   ProcessManager::runProcesses();
 
+  FileOperationsResult fileOperationsResult = FileManager::executeFileOperations();
   // print file operations result fileOperationsResult.fileOperationResults
   // if operation failed print in red color and if success print in green color
   int operationCounter = 1;
